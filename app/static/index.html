@@ -138,6 +138,12 @@
             color: white;
         }
 
+        .repo {
+            font-size: 0.75rem;
+            color: #888;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+        }
+
         .delete-btn {
             background: none;
             border: none;
@@ -247,6 +253,7 @@
                         <div class="message-meta">
                             <span class="timestamp">${formatTimestamp(msg.timestamp)}</span>
                             ${msg.type ? `<span class="badge ${getBadgeClass(msg.type)}">${msg.type}</span>` : ''}
+                            ${msg.repo ? `<span class="repo">${formatRepo(msg.repo)}</span>` : ''}
                         </div>
                         <button class="delete-btn" onclick="deleteMessage('${msg.id}')" title="Delete message">&times;</button>
                     </div>
@@ -268,6 +275,13 @@
             if (!timestamp) return '';
             const date = new Date(timestamp);
             return date.toLocaleString();
+        }
+
+        function formatRepo(repo) {
+            if (!repo) return '';
+            // Extract repo name from git URL (e.g., git@github.com:user/repo.git -> user/repo)
+            const match = repo.match(/[:/]([^/]+\/[^/]+?)(?:\.git)?$/);
+            return match ? match[1] : repo;
         }
 
         function escapeHtml(text) {

@@ -35,9 +35,15 @@ def init_db():
             id INTEGER PRIMARY KEY,
             content TEXT NOT NULL,
             type TEXT NOT NULL,
+            repo TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    # Add repo column if it doesn't exist (migration for existing databases)
+    try:
+        conn.execute("ALTER TABLE messages ADD COLUMN repo TEXT")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     conn.commit()
     conn.close()
 
@@ -130,7 +136,7 @@ class MessageHandler(SimpleHTTPRequestHandler):
 
         conn = get_db_connection()
         cursor = conn.execute(
-            "SELECT id, content, type, timestamp FROM messages ORDER BY timestamp DESC LIMIT ?",
+            "SELECT id, content, type, repo, timestamp FROM messages ORDER BY timestamp DESC LIMIT ?",
             (limit,),
         )
         messages = [row_to_dict(row) for row in cursor.fetchall()]
@@ -169,17 +175,19 @@ class MessageHandler(SimpleHTTPRequestHandler):
                 self.send_error_response("'content' cannot be empty")
                 return
 
+            repo = data.get("repo", "")
+
             conn = get_db_connection()
             cursor = conn.execute(
-                "INSERT INTO messages (content, type) VALUES (?, ?)",
-                (content, message_type),
+                "INSERT INTO messages (content, type, repo) VALUES (?, ?, ?)",
+                (content, message_type, repo),
             )
             conn.commit()
 
             # Fetch the created message
             message_id = cursor.lastrowid
             cursor = conn.execute(
-                "SELECT id, content, type, timestamp FROM messages WHERE id = ?",
+                "SELECT id, content, type, repo, timestamp FROM messages WHERE id = ?",
                 (message_id,),
             )
             message = row_to_dict(cursor.fetchone())
