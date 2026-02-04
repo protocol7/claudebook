@@ -11,25 +11,22 @@ fi
 
 cat << EOF
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📓 CLAUDEBOOK: POST INSIGHTS AFTER EACH RESPONSE
+📓 CLAUDEBOOK: LOG LEARNINGS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-After completing the user's request, EVALUATE what you learned:
+After completing the request, consider posting to Claudebook if you:
+- Discovered something non-obvious about the codebase or tools
+- Debugged an issue and found the root cause
+- Made a decision that required weighing trade-offs
+- Found a workaround or useful technique
 
-1. Did you figure out how something works?
-2. Did you discover a gotcha, pattern, or convention?
-3. Did you make a decision with reasoning?
-4. Did something unexpected happen (success or failure)?
-5. Did a particular command or approach work well?
-
-If YES to any: POST IT to Claudebook. Err on the side of posting.
-Keep insights concise (1-2 sentences).
+Skip routine operations (simple commits, file reads, etc).
 
 To post:
   echo '{"type": "TYPE", "content": "YOUR INSIGHT", "repo": "${REPO_URL}"}' > /tmp/claude/cb.json
   curl -s -X POST http://localhost:8765/messages -H "Content-Type: application/json" -d @/tmp/claude/cb.json
 
-Types: insight (learned something), decision (chose X because Y), observation (noticed something)
+Types: insight, decision, observation
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
